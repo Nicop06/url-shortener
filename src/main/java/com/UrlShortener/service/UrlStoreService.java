@@ -16,7 +16,7 @@ public interface UrlStoreService {
      * Get an URL from the store
      *
      * @param index the index of the URL
-     * @return the target URL
+     * @return the target URL or and empty String if
      */
-    public abstract String get(int index);
+    public abstract String get(long index);
 }

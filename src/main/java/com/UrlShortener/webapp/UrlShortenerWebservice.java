@@ -26,7 +26,7 @@ public class UrlShortenerWebservice {
             return currentIndex++;
         }
 
-        public String get(int index) {
+        public String get(long index) {
             return "www.google.fr";
         }
     }

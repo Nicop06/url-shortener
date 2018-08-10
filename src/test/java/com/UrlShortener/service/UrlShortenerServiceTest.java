@@ -44,7 +44,7 @@ class UrlShortenerServiceTest {
     @Test
     public final void whenTheUrlIsNotFoundThenExceptionIsThrown() {
         Assertions.assertThrows(IOException.class, () -> {
-            urlShortenerService.shortenUrl("http://example.com/badaddr");
+            urlShortenerService.shortenUrl("http://example.com/inexistent");
         });
     }
 
@@ -67,5 +67,42 @@ class UrlShortenerServiceTest {
         Mockito.when(urlStore.insert(Mockito.anyString())).thenReturn(3521614606213L);
         String slug = urlShortenerService.shortenUrl("https://example.com");
         Assertions.assertEquals("FAAAAAAB", slug);
+    }
+
+    @Test
+    public final void whenWeGetAnUrlThenItShouldReturnTheStoredHttpURL() throws IOException {
+        Mockito.when(urlStore.get(12345L)).thenReturn("http://www.example.com");
+        String originalUrl = urlShortenerService.getOriginalUrl("HNDAAAA");
+        Assertions.assertEquals("http://www.example.com", originalUrl);
+    }
+
+    @Test
+    public final void whenWeGetAnUrlThenItShouldReturnTheStoredHttpsURL() throws IOException {
+        Mockito.when(urlStore.get(3521614606213L)).thenReturn("https://www.example.com");
+        String originalUrl = urlShortenerService.getOriginalUrl("FAAAAAAB");
+        Assertions.assertEquals("https://www.example.com", originalUrl);
+    }
+
+    @Test
+    public final void whenWeGetAnInexistentUrlThenItShouldReturnAnEmtpyURL() throws IOException {
+        Mockito.when(urlStore.get(5L)).thenReturn("https://www.example.com");
+        String originalUrl = urlShortenerService.getOriginalUrl("EAAAAAA");
+        Assertions.assertEquals(null, originalUrl);
+    }
+
+    @Test
+    public final void whenWeGetAnUrlTooShortThenExceptionIsThrown() {
+        Mockito.when(urlStore.get(5L)).thenReturn("https://www.example.com");
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            urlShortenerService.getOriginalUrl("FAAAAA");
+        });
+    }
+
+    @Test
+    public final void whenWeGetAnInvalidUrlThenExceptionIsThrown() {
+        Mockito.when(urlStore.get(5L)).thenReturn("https://www.example.com");
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            urlShortenerService.getOriginalUrl("AAAAAA#");
+        });
     }
 }

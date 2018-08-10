@@ -54,6 +54,45 @@ public class UrlShortenerService {
     }
 
     /**
+     * Get the original URL corresponding to a given slug
+     *
+     * @param slug the slug of the short URL
+     * @return the original URL or an empty String if it is invalid
+     */
+    public String getOriginalUrl(String slug) throws IOException {
+        final long index = slugToIndex(slug);
+        return this.store.get(index);
+    }
+
+    /**
+     * Shorten a given URL
+     *
+     * @param slug the slug of the shorten URL
+     * @return the index of the URL in the store
+     */
+    private long slugToIndex(String slug) throws IllegalArgumentException {
+        if (slug == null || slug.length() < SLUG_MIN_SIZE) {
+            throw new IllegalArgumentException("URL size should be at least " + SLUG_MIN_SIZE);
+        }
+
+        long index = 0;
+        long power = 1;
+        final int slugSize = slug.length();
+
+        for (int i = 0; i < slugSize; i++) {
+            char c = slug.charAt(i);
+            int currentIndex = SLUG_ALPHABET.indexOf(c);
+            if (currentIndex == -1) {
+                throw new IllegalArgumentException("Invalid character found in URL: " + c);
+            }
+            index += currentIndex * power;
+            power *= SLUG_ALPHABET_SIZE;
+
+        }
+        return index;
+    }
+
+    /**
      * Shorten a given URL
      *
      * @param urlIndex the index of the URL to slugigy
