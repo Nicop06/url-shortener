@@ -1,4 +1,4 @@
-package com.UrlShortener;
+package com.UrlShortener.service;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -7,7 +7,7 @@ import java.net.URL;
 /**
  * Serice used to shorten the URL
  */
-class UrlShortenerService {
+public class UrlShortenerService {
 
     /**
      * The Maximum number of redirect allowed before URL is rejected by the service
@@ -37,7 +37,7 @@ class UrlShortenerService {
     /**
      * Construct a URL service class
      */
-    UrlShortenerService(UrlStoreService store) {
+    public UrlShortenerService(UrlStoreService store) {
         this.store = store;
     }
 

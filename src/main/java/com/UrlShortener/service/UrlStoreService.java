@@ -1,9 +1,9 @@
-package com.UrlShortener;
+package com.UrlShortener.service;
 
 /**
  * The service to store shorten URL
  */
-interface UrlStoreService {
+public interface UrlStoreService {
     /**
      * Insert an url in the store
      *

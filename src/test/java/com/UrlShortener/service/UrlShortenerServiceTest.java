@@ -1,4 +1,4 @@
-package com.UrlShortener;
+package com.UrlShortener.service;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -7,27 +7,16 @@ import java.net.UnknownHostException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 class UrlShortenerServiceTest {
-
-    private static class UrlStoreServiceMock implements UrlStoreService {
-        public long currentIndex = 0;
-
-        public long insert(String url) {
-            return currentIndex++;
-        }
-
-        public String get(int index) {
-            return "";
-        }
-    }
     
-    private UrlStoreServiceMock urlStore;
+    private UrlStoreService urlStore;
     private UrlShortenerService urlShortenerService;
 
     @BeforeEach
     public void initEach() {
-        urlStore = new UrlStoreServiceMock();
+        urlStore = Mockito.mock(UrlStoreService.class);
         urlShortenerService = new UrlShortenerService(urlStore);
     }
 
@@ -61,21 +50,21 @@ class UrlShortenerServiceTest {
 
     @Test
     public final void whenTheUrlIsFoundThenItShouldReturnTheSlug() throws IOException {
-        urlStore.currentIndex = 12345L;
+        Mockito.when(urlStore.insert(Mockito.anyString())).thenReturn(12345L);
         String slug = urlShortenerService.shortenUrl("example.com");
         Assertions.assertEquals("HNDAAAA", slug);
     }
 
     @Test
     public final void whenTheUrlStartingWithHttpIsFoundThenItShouldReturnTheSlug() throws IOException {
-        urlStore.currentIndex = 5L;
+        Mockito.when(urlStore.insert(Mockito.anyString())).thenReturn(5L);
         String slug = urlShortenerService.shortenUrl("http://example.com");
         Assertions.assertEquals("FAAAAAA", slug);
     }
 
     @Test
     public final void whenTheUrlStartingWithHttpsIsFoundThenItShouldReturnTheSlug() throws IOException {
-        urlStore.currentIndex = 3521614606213L;
+        Mockito.when(urlStore.insert(Mockito.anyString())).thenReturn(3521614606213L);
         String slug = urlShortenerService.shortenUrl("https://example.com");
         Assertions.assertEquals("FAAAAAAB", slug);
     }
