@@ -26,5 +26,6 @@ dependencies {
     testImplementation "org.junit.jupiter:junit-jupiter-api:5.0.0"
     testRuntime "org.junit.jupiter:junit-jupiter-engine:5.0.0"
     compile 'org.glassfish.jersey.containers:jersey-container-servlet:2.27'
+    compile 'org.glassfish.jersey.inject:jersey-hk2:2.27'
     compile 'org.json:json:20180130'
 }

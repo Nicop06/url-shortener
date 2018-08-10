@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -66,18 +68,30 @@ public class UrlShortenerWebservice {
 
             urlToShorten = parsedInput.getString("url");
         } catch (Exception e) {
-            return Response.status(500).entity("Invalid POST data.").build();
+            return Response
+                .status(Response.Status.INTERNAL_SERVER_ERROR)
+                .entity("Invalid POST data.")
+                .build();
         }
 
         // Shorten URL
         try {
             slug = service.shortenUrl(urlToShorten);
         } catch (MalformedURLException e) {
-            return Response.status(500).entity("The URL is malformed.").build();
+            return Response
+                .status(Response.Status.INTERNAL_SERVER_ERROR)
+                .entity("The URL is malformed.")
+                .build();
         } catch (IOException e) {
-            return Response.status(500).entity("Unable to connect to the URL.").build();
+            return Response
+                .status(Response.Status.INTERNAL_SERVER_ERROR)
+                .entity("Unable to connect to the URL.")
+                .build();
         } catch (Exception e) {
-            return Response.status(500).entity("Unable to shorten the URL.").build();
+            return Response
+                .status(Response.Status.INTERNAL_SERVER_ERROR)
+                .entity("Unable to shorten the URL.")
+                .build();
         }
 
         String shortenedUrl = this.servicePrefix + slug;
@@ -85,17 +99,27 @@ public class UrlShortenerWebservice {
         // Encode response
         try {
             String response = new JSONObject()
-                .put("shortened_url", shortenedUrl).toString();
-            return Response.status(201).entity(response).build();
+                .put("shortened_url", shortenedUrl)
+                .toString();
+            return Response
+                .status(Response.Status.CREATED)
+                .entity(response)
+                .build();
         } catch (Exception e) {
-            return Response.status(500).entity("Unable to encode response.").build();
+            return Response
+                .status(Response.Status.INTERNAL_SERVER_ERROR)
+                .entity("Unable to encode response.")
+                .build();
         }
     }
 
     @GET
-    @Path("/{shortUrl}")
-    public Response getOriginalUrl(InputStream incomingData) {
-        return Response.status(200).entity("").build();
+    @Path("/{shortenUrl}")
+    public Response getOriginalUrl() throws URISyntaxException {
+        return Response
+            .status(Response.Status.MOVED_PERMANENTLY)
+            .location(new URI("http://www.example.com/"))
+            .build();
     }
 
 }
