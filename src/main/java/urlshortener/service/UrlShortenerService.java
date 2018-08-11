@@ -1,18 +1,9 @@
-package com.UrlShortener.service;
-
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
+package urlshortener.service;
 
 /**
  * Serice used to shorten the URL
  */
 public class UrlShortenerService {
-
-    /**
-     * The Maximum number of redirect allowed before URL is rejected by the service
-     */
-    private static final int MAXIMUM_REDIRECT = 3;
 
     /**
      * The alphabet used to generate the slug
@@ -47,8 +38,7 @@ public class UrlShortenerService {
      * @param urltoshorten the URL to shorten
      * @return the slug of the shorten URL
      */
-    public String shortenUrl(String urlToShorten) throws IOException {
-        checkHttpUrl(urlToShorten);
+    public String shortenUrl(String urlToShorten) {
         long urlIndex = store.insert(urlToShorten);
         return indexToSlug(urlIndex);
     }
@@ -59,20 +49,24 @@ public class UrlShortenerService {
      * @param slug the slug of the short URL
      * @return the original URL or an empty String if it is invalid
      */
-    public String getOriginalUrl(String slug) throws IOException {
+    public String getOriginalUrl(String slug) {
         final long index = slugToIndex(slug);
-        return this.store.get(index);
+        if (index >= 0) {
+            return this.store.get(index);
+        } else {
+            return null;
+        }
     }
 
     /**
      * Shorten a given URL
      *
      * @param slug the slug of the shorten URL
-     * @return the index of the URL in the store
+     * @return the index of the URL in the store or -1 if the slug if not valid
      */
-    private long slugToIndex(String slug) throws IllegalArgumentException {
+    private long slugToIndex(String slug) {
         if (slug == null || slug.length() < SLUG_MIN_SIZE) {
-            throw new IllegalArgumentException("URL size should be at least " + SLUG_MIN_SIZE);
+            return -1;
         }
 
         long index = 0;
@@ -83,7 +77,7 @@ public class UrlShortenerService {
             char c = slug.charAt(i);
             int currentIndex = SLUG_ALPHABET.indexOf(c);
             if (currentIndex == -1) {
-                throw new IllegalArgumentException("Invalid character found in URL: " + c);
+                return -1;
             }
             index += currentIndex * power;
             power *= SLUG_ALPHABET_SIZE;
@@ -107,40 +101,5 @@ public class UrlShortenerService {
             size++;
         }
         return slugBuilder.toString();
-    }
-
-    /**
-     * Check a given URL
-     *
-     * @param urlToCheck the URL to shorten
-     * @throws IOException if the URL is invalid
-     */
-    private void checkHttpUrl(String urlToCheck) throws IOException {
-        String realUrl = urlToCheck;
-        if (realUrl != null && !realUrl.isEmpty() && !realUrl.startsWith("http://")
-                && !realUrl.startsWith("https://")) {
-            realUrl = "http://" + realUrl;
-        }
-
-        HttpURLConnection connection;
-
-        // Follow the redirections
-        for (int nbRedirect = 0; nbRedirect < MAXIMUM_REDIRECT; nbRedirect++) {
-            URL url = new URL(realUrl);
-            connection = (HttpURLConnection) url.openConnection();
-            int status = connection.getResponseCode();
-            nbRedirect++;
-
-            if (status == HttpURLConnection.HTTP_OK) {
-                break;
-            } else if (status == HttpURLConnection.HTTP_MOVED_TEMP
-                    || status == HttpURLConnection.HTTP_MOVED_PERM
-                    || status == HttpURLConnection.HTTP_SEE_OTHER)
-            {
-                realUrl = connection.getHeaderField("Location");
-            } else {
-                throw new IOException();
-            }
-        }
     }
 }

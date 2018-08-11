@@ -1,4 +1,4 @@
-package com.UrlShortener.service;
+package urlshortener.service;
 
 /**
  * The service to store shorten URL
