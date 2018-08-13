@@ -1,26 +1,31 @@
 package urlshortener.controller;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import urlshortener.service.UrlShortenerService;
+
 @RunWith(SpringRunner.class)
-@SpringBootTest
-@AutoConfigureMockMvc
+@WebMvcTest(UrlShortenerController.class)
 public class UrlShortenerControllerTest {
 
     @Autowired
     private MockMvc mvc;
+
+    @MockBean
+    private UrlShortenerService service;
 
     @Test
     public void whenTheUrlIsInvalidThenStatusShouldBeBadRequest() throws Exception {
@@ -32,29 +37,46 @@ public class UrlShortenerControllerTest {
     }
 
     @Test
-    public void whenTheUrlHasNoSchemeThenSlugShouldBeReturned() throws Exception {
+    public void whenTheUrlIsLocalThenSlugShouldBeReturned() throws Exception {
+        Mockito.when(service.shortenUrl("localhost")).thenReturn("ABCDEF5");
         mvc.perform(MockMvcRequestBuilders.post("/shorten_url")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"url\":\"www.example.com\"}"))
+                .content("{\"url\":\"localhost\"}"))
             .andExpect(status().isOk())
-            .andExpect(content().string("{\"shortened_url\":\"www.example.com\"}"));
+            .andExpect(content().string("{\"shortened_url\":\"http://localhost/ABCDEF5\"}"));
+    }
+
+    @Test
+    public void whenTheUrlHasNoSchemeThenSlugShouldBeReturned() throws Exception {
+        String originalUrl = "www.example.com";
+        Mockito.when(service.shortenUrl(Mockito.anyString())).thenReturn("ABCDEF5");
+        mvc.perform(MockMvcRequestBuilders.post("/shorten_url")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"url\":\"" + originalUrl + "\"}"))
+            .andExpect(status().isOk())
+            .andExpect(content().string("{\"shortened_url\":\"http://localhost/ABCDEF5\"}"));
     }
 
     @Test
     public void whenTheUrlIsHttpsThenSlugShouldBeReturned() throws Exception {
+        String originalUrl = "https://www.example.com";
+        Mockito.when(service.shortenUrl(originalUrl)).thenReturn("ABCDEF5");
         mvc.perform(MockMvcRequestBuilders.post("/shorten_url")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"url\":\"https://www.example.com\"}"))
+                .content("{\"url\":\"" + originalUrl + "\"}"))
             .andExpect(status().isOk())
-            .andExpect(content().string("{\"shortened_url\":\"https://www.example.com\"}"));
+            .andExpect(content().string("{\"shortened_url\":\"http://localhost/ABCDEF5\"}"));
     }
 
     @Test
     public void whenWeGetAnUrlWeShouldBeRedirected() throws Exception {
+        String originalUrl = "https://www.example.com";
+        Mockito.when(service.getOriginalUrl("ABCDEF5")).thenReturn(originalUrl);
         mvc.perform(MockMvcRequestBuilders.get("/ABCDEF5"))
             .andExpect(status().isMovedPermanently())
-            .andExpect(header().string("Location", "https://www.example.com"));
+            .andExpect(header().string("Location", originalUrl));
     }
 }

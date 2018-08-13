@@ -3,7 +3,9 @@ package urlshortener.validator;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-public class UrlValidator implements ConstraintValidator<UrlConstraint, String> {
+import org.apache.commons.validator.routines.UrlValidator;
+
+public class UrlFieldValidator implements ConstraintValidator<UrlConstraint, String> {
 
     @Override
     public void initialize(UrlConstraint url) {
@@ -11,8 +13,7 @@ public class UrlValidator implements ConstraintValidator<UrlConstraint, String> 
 
     @Override
     public boolean isValid(String urlField, ConstraintValidatorContext cxt) {
-        org.apache.commons.validator.routines.UrlValidator urlValidator
-            = new org.apache.commons.validator.routines.UrlValidator();
+        UrlValidator urlValidator = new UrlValidator(UrlValidator.ALLOW_LOCAL_URLS);
         return urlValidator.isValid(urlField) || urlValidator.isValid("http://" + urlField);
     }
 

@@ -1,8 +1,11 @@
 package urlshortener.service;
 
+import org.springframework.stereotype.Service;
+
 /**
  * Serice used to shorten the URL
  */
+@Service
 public class UrlShortenerService {
 
     /**
@@ -23,10 +26,11 @@ public class UrlShortenerService {
     /**
      * The URL store
      */
-    UrlStoreService store;
+    private final UrlStoreService store;
 
     /**
      * Construct a URL service class
+     * @param store The service used to store URLs
      */
     public UrlShortenerService(UrlStoreService store) {
         this.store = store;

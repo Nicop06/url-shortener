@@ -1,9 +1,11 @@
 package urlshortener.service;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
+import org.springframework.stereotype.Service;
+
+@Service
 public class SimpleUrlStoreService implements UrlStoreService {
     private List<String> urls = new ArrayList<>();
 
@@ -20,5 +22,3 @@ public class SimpleUrlStoreService implements UrlStoreService {
         }
     }
 }
-
-
