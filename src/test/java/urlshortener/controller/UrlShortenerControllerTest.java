@@ -43,7 +43,7 @@ public class UrlShortenerControllerTest {
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"url\":\"localhost\"}"))
-            .andExpect(status().isOk())
+            .andExpect(status().isCreated())
             .andExpect(content().string("{\"shortened_url\":\"http://localhost/ABCDEF5\"}"));
     }
 
@@ -55,7 +55,7 @@ public class UrlShortenerControllerTest {
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"url\":\"" + originalUrl + "\"}"))
-            .andExpect(status().isOk())
+            .andExpect(status().isCreated())
             .andExpect(content().string("{\"shortened_url\":\"http://localhost/ABCDEF5\"}"));
     }
 
@@ -67,7 +67,7 @@ public class UrlShortenerControllerTest {
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"url\":\"" + originalUrl + "\"}"))
-            .andExpect(status().isOk())
+            .andExpect(status().isCreated())
             .andExpect(content().string("{\"shortened_url\":\"http://localhost/ABCDEF5\"}"));
     }
 

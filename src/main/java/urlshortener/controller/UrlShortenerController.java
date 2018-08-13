@@ -39,6 +39,7 @@ public class UrlShortenerController {
             int URLLength = shortenedUrl.length();
             int URILength = request.getRequestURI().length();
             shortenedUrl.replace(URLLength - URILength, URLLength, "/" + slug);
+            response.setStatus(HttpServletResponse.SC_CREATED);
             return new ShortenedUrl(shortenedUrl.toString());
         } else {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
