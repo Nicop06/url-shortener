@@ -6,14 +6,16 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import urlshortener.store.UrlStore;
+
 public class UrlShortenerServiceTest {
     
-    private UrlStoreService urlStore;
+    private UrlStore urlStore;
     private UrlShortenerService urlShortenerService;
 
     @Before
     public void initEach() {
-        urlStore = Mockito.mock(UrlStoreService.class);
+        urlStore = Mockito.mock(UrlStore.class);
         urlShortenerService = new UrlShortenerService(urlStore);
     }
 

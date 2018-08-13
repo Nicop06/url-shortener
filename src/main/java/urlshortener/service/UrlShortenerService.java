@@ -2,6 +2,8 @@ package urlshortener.service;
 
 import org.springframework.stereotype.Service;
 
+import urlshortener.store.UrlStore;
+
 /**
  * Serice used to shorten the URL
  */
@@ -26,13 +28,13 @@ public class UrlShortenerService {
     /**
      * The URL store
      */
-    private final UrlStoreService store;
+    private final UrlStore store;
 
     /**
      * Construct a URL service class
      * @param store The service used to store URLs
      */
-    public UrlShortenerService(UrlStoreService store) {
+    public UrlShortenerService(UrlStore store) {
         this.store = store;
     }
 

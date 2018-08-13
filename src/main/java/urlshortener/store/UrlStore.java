@@ -1,9 +1,9 @@
-package urlshortener.service;
+package urlshortener.store;
 
 /**
  * The service to store shorten URL
  */
-public interface UrlStoreService {
+public interface UrlStore {
     /**
      * Insert an url in the store
      *
