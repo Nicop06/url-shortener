@@ -1,4 +1,4 @@
-# Url shortner
+# URL shortner
 
 This application is a simple URL shortener using Java Spring MVC and Redis.
 
