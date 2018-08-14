@@ -1,24 +1,37 @@
 package urlshortener.store;
 
-import org.springframework.data.redis.connection.RedisConnectionFactory;
+import javax.annotation.PostConstruct;
+
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.data.redis.support.atomic.RedisAtomicLong;
 import org.springframework.stereotype.Service;
 
 @Service
 public class RedisUrlStore implements UrlStore {
 
-    RedisConnectionFactory factory;
+    private RedisTemplate<Long, String> template;
+    private RedisAtomicLong urlIndex;
+    private ValueOperations<Long, String> urlStoreOperation;
 
-    RedisUrlStore(RedisConnectionFactory factory) {
-        this.factory = factory;
+    RedisUrlStore(RedisTemplate<Long, String> template) {
+        this.template = template;
     }
 
+    @PostConstruct
+    private void init(){
+        this.urlIndex = new RedisAtomicLong("#urlidx", this.template.getConnectionFactory());
+        this.urlStoreOperation = this.template.opsForValue();
+    }
+
+
     public long insert(String url) {
-        RedisAtomicLong urlIndex = new RedisAtomicLong("#urlidx", this.factory);
-        return 1L;
+        long currentIndex = this.urlIndex.incrementAndGet();
+        this.urlStoreOperation.set(currentIndex, url);
+        return currentIndex;
     }
 
     public String get(long index) {
-        return "";
+        return this.urlStoreOperation.get(index);
     }
 }
