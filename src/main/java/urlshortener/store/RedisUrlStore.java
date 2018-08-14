@@ -24,7 +24,6 @@ public class RedisUrlStore implements UrlStore {
         this.urlStoreOperation = this.template.opsForValue();
     }
 
-
     public long insert(String url) {
         long currentIndex = this.urlIndex.incrementAndGet();
         this.urlStoreOperation.set(currentIndex, url);

@@ -1,8 +1,15 @@
 package urlshortener.service;
 
+import java.util.Collections;
+import java.util.Map;
+
+import javax.annotation.PostConstruct;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import urlshortener.store.UrlStore;
+import urlshortener.utils.UrlCache;
 
 /**
  * Serice used to shorten the URL
@@ -31,11 +38,29 @@ public class UrlShortenerService {
     private final UrlStore store;
 
     /**
+     * The URL cache
+     */
+    private Map<String, String> cache = null;;
+
+    /**
+     * The size of the cache
+     */
+    @Value("${urlshortener.cache.size:1000}")
+    private int cacheSize;
+
+    /**
      * Construct a URL service class
      * @param store The service used to store URLs
      */
     public UrlShortenerService(UrlStore store) {
         this.store = store;
+        this.cache = Collections.synchronizedMap(new UrlCache(0));
+    }
+
+    @PostConstruct
+    private void init(){
+        // Only called when real application is up
+        this.cache = Collections.synchronizedMap(new UrlCache(this.cacheSize));
     }
 
     /**
@@ -45,8 +70,10 @@ public class UrlShortenerService {
      * @return the slug of the shorten URL
      */
     public String shortenUrl(String urlToShorten) {
-        long urlIndex = store.insert(urlToShorten);
-        return indexToSlug(urlIndex);
+        long urlIndex = this.store.insert(urlToShorten);
+        String slug = this.indexToSlug(urlIndex);
+        this.cache.put(slug, urlToShorten);
+        return slug;
     }
 
     /**
@@ -56,12 +83,14 @@ public class UrlShortenerService {
      * @return the original URL or an empty String if it is invalid
      */
     public String getOriginalUrl(String slug) {
-        final long index = slugToIndex(slug);
-        if (index >= 0) {
-            return this.store.get(index);
-        } else {
-            return null;
+        if (this.cache.containsKey(slug)) {
+            return this.cache.get(slug);
         }
+
+        final long index = this.slugToIndex(slug);
+        String originalUrl = index >= 0 ? this.store.get(index) : null;
+        this.cache.put(slug, originalUrl);
+        return originalUrl;
     }
 
     /**
