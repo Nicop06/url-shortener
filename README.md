@@ -145,7 +145,7 @@ and we can expect to be able to create new nodes faster than they crash.
 ## Benchmarking
 
 These benchmark have been performed on a single machine after running
-`docker-compose up`. They use ApacheBench. The port 9090 is directly targeting
+`docker-compose up`. We use ApacheBench. The port 9090 is directly targeting
 one of the backends while the port 8080 is using haproxy load balancing on
 3 backends.
 
@@ -153,21 +153,22 @@ First, targeting the backend:
 
 ```
 $ ab -n 100000 -c 50 http://localhost:9090/2AAAAAA
-Requests per second:    10699.77 [#/sec] (mean)
-Time per request:       4.673 [ms] (mean)
+Requests per second:    10069.60 [#/sec] (mean)
+Time per request:       4.965 [ms] (mean)
 ```
 
 Then using haproxy:
 
 ```
 $ ab -n 100000 -c 50 http://localhost:8080/2AAAAAA
-Requests per second:    5893.32 [#/sec] (mean)
-Time per request:       8.484 [ms] (mean)
+Requests per second:    8688.72 [#/sec] (mean)
+Time per request:       5.755 [ms] (mean)
 ```
 
 In both cases, we have more than 1000 requests per second.
 
-Running all backends on a single machine leads to performance degradation when
-using haproxy. This degradation might be due to the delay introduced by the
-load balancer to the requests. A single backend is able to use all core of the
-machine, yielding better performance than multiple backends behind a proxy.
+Using a load balancer on the same machine than the backends does not yield any
+improvement. It even reduces slightly the throughput. The ideal architecture is
+to have one machine for the load balancer and one backend per server. Also, in
+this use case, Redis is not bottleneck as it is not even used thanks to the
+presence local cache.
