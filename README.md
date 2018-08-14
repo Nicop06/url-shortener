@@ -14,6 +14,7 @@ Recommended:
 * Docker
 * Gradle
 * curl
+* ApacheBench (for benchmarking)
 
 ## Run
 
@@ -140,3 +141,31 @@ cluster](https://redis.io/topics/cluster-tutorial). This could scale the read
 and write requests and allow better persistence. If enough replica are setup,
 persistence could even be removed considering the data stored are not critical
 and we can expect to be able to create new nodes faster than they crash.
+
+## Benchmarking
+
+These benchmark have been performed on a single machine after running
+`docker-compose up`. They use ApacheBench. The port 9090 is directly targeting
+one of the backends while the port 8080 is using haproxy load balancing on
+3 backends.
+
+First, targeting the backend:
+
+```
+ab -n 100000 -c 50 http://localhost:9090/2AAAAAA
+Requests per second:    10699.77 [#/sec] (mean)
+Time per request:       4.673 [ms] (mean)
+```
+
+Then using haproxy:
+
+```
+ab -n 100000 -c 50 http://localhost:8080/2AAAAAA
+Requests per second:    5893.32 [#/sec] (mean)
+Time per request:       8.484 [ms] (mean)
+```
+
+Running all backends on a single machine leads to performance degradation as
+haproxy is mostly adding delay while a single backend are able to use all cores
+of the machine when under pressure. This means that haproxy does not yield any
+benefit. This would be the case if several machines are used.

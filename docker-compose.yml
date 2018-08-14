@@ -13,15 +13,17 @@ services:
   urlshortenera:
     image: nporcel/url-shortener:latest
     links:
-    - redis
+      - redis
+    ports:
+      - "9090:8080"
   urlshortenerb:
     image: nporcel/url-shortener:latest
     links:
-    - redis
+      - redis
   urlshortenerc:
     image: nporcel/url-shortener:latest
     links:
-    - redis
+      - redis
   redis:
     image: redis:alpine
     command: redis-server --appendonly yes
