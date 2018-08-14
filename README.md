@@ -24,13 +24,13 @@ By far the easiest way, you can use `docker-compose` to run the service. First,
 you need to build it:
 
 ```
-./gradlew docker
+$ ./gradlew docker
 ```
 
 Then, you can run it:
 
 ```
-docker-compose up
+$ docker-compose up
 ```
 
 This will run Redis, 3 instances of the application and haproxy load balancer.
@@ -40,21 +40,21 @@ This will run Redis, 3 instances of the application and haproxy load balancer.
 You can also use plain docker to run redis:
 
 ```
-docker run --name redis -p 6379:6379 -d redis:alpine
+$ docker run --name redis -p 6379:6379 -d redis:alpine
 ```
 
 Then you can build and run the application:
 
 ```
-./gradlew build
-./gradlew bootRun
+$ ./gradlew build
+$ ./gradlew bootRun
 ```
 
 You can also run the service with docker:
 
 ```
-./gradlew docker
-docker run --name urlshortener -p 8080:8080 -d --link redis nporcel/url-shortener
+$ ./gradlew docker
+$ docker run --name urlshortener -p 8080:8080 -d --link redis nporcel/url-shortener
 ```
 
 ### Without docker
@@ -76,7 +76,7 @@ application:
 To test the application, you can use this script to fill some data:
 
 ```
-./fill.sh
+$ ./fill.sh
 ```
 
 This will fill the cache with to DuckDuckGo image search results for different
@@ -86,7 +86,7 @@ and enjoy some cat pictures.
 You can also manually insert an url using curl:
 
 ```
-curl -H "Content-Type: application/json" -d'{"url":"http://www.example.com"}' localhost:8080/shorten_url
+$ curl -H "Content-Type: application/json" -d'{"url":"http://www.example.com"}' localhost:8080/shorten_url
 {"shortened_url":"http://localhost:8080/BAAAAAA"}
 ```
 
@@ -97,7 +97,7 @@ Then you can visit <http://localhost:8080/BAAAAAA> in your browser.
 To execute the tests, run the following command:
 
 ```
-./gradlew test
+$ ./gradlew test
 ```
 
 ## Scaling
@@ -152,7 +152,7 @@ one of the backends while the port 8080 is using haproxy load balancing on
 First, targeting the backend:
 
 ```
-ab -n 100000 -c 50 http://localhost:9090/2AAAAAA
+$ ab -n 100000 -c 50 http://localhost:9090/2AAAAAA
 Requests per second:    10699.77 [#/sec] (mean)
 Time per request:       4.673 [ms] (mean)
 ```
@@ -160,12 +160,14 @@ Time per request:       4.673 [ms] (mean)
 Then using haproxy:
 
 ```
-ab -n 100000 -c 50 http://localhost:8080/2AAAAAA
+$ ab -n 100000 -c 50 http://localhost:8080/2AAAAAA
 Requests per second:    5893.32 [#/sec] (mean)
 Time per request:       8.484 [ms] (mean)
 ```
 
-Running all backends on a single machine leads to performance degradation as
-haproxy is mostly adding delay while a single backend are able to use all cores
-of the machine when under pressure. This means that haproxy does not yield any
-benefit. This would be the case if several machines are used.
+In both cases, we have more than 1000 requests per second.
+
+Running all backends on a single machine leads to performance degradation when
+using haproxy. This degradation might be due to the delay introduced by the
+load balancer to the requests. A single backend is able to use all core of the
+machine, yielding better performance than multiple backends behind a proxy.
