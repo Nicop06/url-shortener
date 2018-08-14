@@ -4,17 +4,15 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-public class UrlCacheTest {
-    @Test
-    public final void whenUrlIsEmptyReturnError() {
+import urlshortener.utils.UrlCache;
 
-    }
+public class UrlCacheTest {
 
     @Test
     public final void whenUrlCacheHasSizeOneThenItShouldKeepTheLastInsertedElement() {
         UrlCache urlCache = new UrlCache(1);
-        urlCache.insert("toto", "myurl");
-        urlCache.insert("titi", "mynewurl");
+        urlCache.put("toto", "myurl");
+        urlCache.put("titi", "mynewurl");
         assertEquals(1, urlCache.size());
         assertEquals("mynewurl", urlCache.get("titi"));
     }
@@ -29,9 +27,9 @@ public class UrlCacheTest {
     @Test
     public final void whenUrlCacheIsNotFullThenItShouldKeepEntries() {
         UrlCache urlCache = new UrlCache(3);
-        urlCache.insert("1", "myurl1");
-        urlCache.insert("2", "myurl2");
-        urlCache.insert("3", "myurl3");
+        urlCache.put("1", "myurl1");
+        urlCache.put("2", "myurl2");
+        urlCache.put("3", "myurl3");
 
         assertEquals(3, urlCache.size());
         assertEquals("myurl1", urlCache.get("1"));
@@ -42,10 +40,10 @@ public class UrlCacheTest {
     @Test
     public final void whenUrlCacheIsFullThenItShouldEvictTheLeastRecentlyInsertedEntry() {
         UrlCache urlCache = new UrlCache(3);
-        urlCache.insert("1", "myurl1");
-        urlCache.insert("2", "myurl2");
-        urlCache.insert("3", "myurl3");
-        urlCache.insert("4", "myurl4");
+        urlCache.put("1", "myurl1");
+        urlCache.put("2", "myurl2");
+        urlCache.put("3", "myurl3");
+        urlCache.put("4", "myurl4");
 
         assertEquals(3, urlCache.size());
         assertEquals(null    , urlCache.get("1"));
@@ -57,12 +55,12 @@ public class UrlCacheTest {
     @Test
     public final void whenUrlCacheIsFullThenItShouldEvictTheLeastRecentlyUpdatedEntries() {
         UrlCache urlCache = new UrlCache(3);
-        urlCache.insert("1", "myurl1");
-        urlCache.insert("2", "myurl2");
-        urlCache.insert("3", "myurl3");
+        urlCache.put("1", "myurl1");
+        urlCache.put("2", "myurl2");
+        urlCache.put("3", "myurl3");
 
-        urlCache.insert("1", "myurl4");
-        urlCache.insert("5", "myurl5");
+        urlCache.put("1", "myurl4");
+        urlCache.put("5", "myurl5");
 
         assertEquals(3, urlCache.size());
         assertEquals("myurl4", urlCache.get("1"));
@@ -74,12 +72,12 @@ public class UrlCacheTest {
     @Test
     public final void whenUrlCacheIsFullThenItShouldEvictTheLeastRecentlyAccessedEntries() {
         UrlCache urlCache = new UrlCache(3);
-        urlCache.insert("1", "myurl1");
-        urlCache.insert("2", "myurl2");
-        urlCache.insert("3", "myurl3");
+        urlCache.put("1", "myurl1");
+        urlCache.put("2", "myurl2");
+        urlCache.put("3", "myurl3");
         urlCache.get("1");
-        urlCache.insert("4", "myurl4");
-        urlCache.insert("5", "myurl5");
+        urlCache.put("4", "myurl4");
+        urlCache.put("5", "myurl5");
 
         assertEquals(3, urlCache.size());
         assertEquals("myurl1", urlCache.get("1"));

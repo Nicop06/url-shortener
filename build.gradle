@@ -1,9 +1,13 @@
 buildscript {
     repositories {
         mavenCentral()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
     }
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:2.0.3.RELEASE")
+        classpath('gradle.plugin.com.palantir.gradle.docker:gradle-docker:0.20.1')
     }
 }
 
@@ -11,6 +15,9 @@ apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
+apply plugin: 'com.palantir.docker'
+
+group = 'nporcel'
 
 bootJar {
     baseName = 'url-shortener'
@@ -29,4 +36,11 @@ dependencies {
     compile("org.springframework.boot:spring-boot-starter-web")
     compile("commons-validator:commons-validator:1.4.0")
     testCompile("org.springframework.boot:spring-boot-starter-test")
+}
+
+docker {
+    dependsOn build
+    name "${project.group}/${bootJar.baseName}"
+    files bootJar.archivePath
+    buildArgs(['JAR_FILE': "${bootJar.archiveName}"])
 }

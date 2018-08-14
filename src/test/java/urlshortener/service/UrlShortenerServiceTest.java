@@ -5,9 +5,11 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import urlshortener.store.UrlStore;
 
+@SpringBootTest
 public class UrlShortenerServiceTest {
     
     private UrlStore urlStore;
