@@ -32,6 +32,8 @@ Then, you can run it:
 docker-compose up
 ```
 
+This will run Redis, 3 instances of the application and haproxy load balancer.
+
 ### Using plain docker
 
 You can also use plain docker to run redis:

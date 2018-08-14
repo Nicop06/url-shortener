@@ -1,9 +1,25 @@
 version: '3'
 services:
-  urlshortener:
-    image: nporcel/url-shortener:latest
+  haproxy:
+    image: haproxy:alpine
+    volumes:
+        - $PWD/haproxy:/usr/local/etc/haproxy:ro
+    links:
+      - urlshortenera
+      - urlshortenerb
+      - urlshortenerc
     ports:
-    - "8080:8080"
+      - "8080:80"
+  urlshortenera:
+    image: nporcel/url-shortener:latest
+    links:
+    - redis
+  urlshortenerb:
+    image: nporcel/url-shortener:latest
+    links:
+    - redis
+  urlshortenerc:
+    image: nporcel/url-shortener:latest
     links:
     - redis
   redis:
